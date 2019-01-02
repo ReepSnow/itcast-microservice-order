@@ -1,5 +1,6 @@
 package cn.itcast.microservice.order.service;
 
+import cn.itcast.microservice.order.client.ItemFeignClient;
 import cn.itcast.microservice.order.entity.Item;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class ItemService {
     @Value("${itcast.item.url}")
     private String itcastItemUrl;
 
+    @Autowired
+    private ItemFeignClient itemFeignClient;
+
    /* public Item queryItemById(Long id) {
         String serviceId = "itcast-microservice-item";
         List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceId);
@@ -52,9 +56,10 @@ public class ItemService {
    //使用负载均衡ribbon的写法
    @HystrixCommand(fallbackMethod = "queryItemByIdFallbackMethod") // 进行容错处理
     public Item queryItemById(Long id) {
-        String serviceId = "itcast-microservice-item";
+       /* String serviceId = "itcast-microservice-item";
         //因为item项目提供者提供了实例的名称，所以直接通过实例名称来作为请求地址
-        return this.restTemplate.getForObject("http://" + serviceId + "/item/" + id, Item.class);
+        return this.restTemplate.getForObject("http://" + serviceId + "/item/" + id, Item.class);*/
+       return this.itemFeignClient.queryItemById(id);
     }
 
     public Item queryItemByIdFallbackMethod(Long id){ // 请求失败执行的方法
